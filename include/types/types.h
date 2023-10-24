@@ -1,0 +1,6 @@
+#ifndef LIBYCVID_INCLUDE_TYPES_H
+#define LIBYCVID_INCLUDE_TYPES_H
+
+#include "view/view.h"
+
+#endif //LIBYCVID_INCLUDE_TYPES_H

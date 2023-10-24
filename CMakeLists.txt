@@ -12,5 +12,6 @@ target_include_directories(ycvid PRIVATE private)
 
 target_include_directories(ycvid PRIVATE dependencies/libycenv/dependencies/libycres/include)
 target_include_directories(ycvid PRIVATE dependencies/libycenv/include)
+
 add_subdirectory(dependencies/libycenv)
 add_dependencies(ycvid ycenv)
