@@ -1,0 +1,3 @@
+[submodule "dependencies/libycenv"]
+	path = dependencies/libycenv
+	url = git@github.com:yellowcake-org/libycenv.git
