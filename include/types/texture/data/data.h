@@ -1,8 +1,6 @@
 #ifndef LIBYCVID_INCLUDE_TYPES_TEXTURE_DATA_H
 #define LIBYCVID_INCLUDE_TYPES_TEXTURE_DATA_H
 
-#include <libycres.h>
-
 typedef uint32_t yc_vid_texture_handle_t;
 
 typedef struct yc_vid_texture_set {
