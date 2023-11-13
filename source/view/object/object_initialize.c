@@ -43,64 +43,11 @@ yc_vid_status_t yc_vid_view_object_initialize(
         yc_vid_texture_set_t *set = &object->sets[pair_idx];
         yc_res_frm_animation_t *animation = &parsed.sprite->animations[pair_idx];
 
-        set->fps = animation->fps;
-        set->keyframe_idx = animation->keyframe_idx;
+        status = yc_vid_texture_set_initialize(set, animation, &palette, renderer);
 
-        set->count = animation->count;
-        set->pointers = malloc(sizeof(yc_vid_texture_handle_t) * set->count);
-
-        if (NULL == set->pointers) {
-            status = YC_VID_STATUS_MEM;
-
+        if (YC_VID_STATUS_OK != status) {
             yc_vid_view_object_invalidate(object, renderer);
             goto cleanup_and_return;
-        }
-
-        for (size_t handle_idx = 0; handle_idx < set->count; ++handle_idx) {
-            yc_res_frm_texture_t *texture = &animation->frames[handle_idx];
-            yc_vid_texture_handle_t *handle = &set->pointers[handle_idx];
-
-            yc_vid_texture_data_t data = {
-                    .shift = texture->shift,
-                    .dimensions = {
-                            .horizontal = texture->dimensions.horizontal,
-                            .vertical = texture->dimensions.vertical
-                    },
-                    .pixels = NULL
-            };
-
-            data.pixels = malloc(
-                    sizeof(yc_res_pal_color_t) *
-                    texture->dimensions.horizontal *
-                    texture->dimensions.vertical
-            );
-
-            if (NULL == data.pixels) {
-                status = YC_VID_STATUS_MEM;
-
-                yc_vid_view_object_invalidate(object, renderer);
-                goto cleanup_and_return;
-            }
-
-            for (size_t horizontal_idx = 0; horizontal_idx < data.dimensions.horizontal; ++horizontal_idx) {
-                for (size_t vertical_idx = 0; vertical_idx < data.dimensions.vertical; ++vertical_idx) {
-                    size_t linear_idx = horizontal_idx * vertical_idx;
-
-                    yc_res_pal_color_t *source = &palette.colors[texture->pixels[linear_idx]];
-                    yc_res_pal_color_t *destination = &data.pixels[linear_idx];
-
-                    destination->r = source->r;
-                    destination->g = source->g;
-                    destination->b = source->b;
-                }
-            }
-
-            status = renderer->texture->initialize(handle, &data);
-
-            if (YC_VID_STATUS_OK != status) {
-                yc_vid_view_object_invalidate(object, renderer);
-                goto cleanup_and_return;
-            }
         }
     }
 
