@@ -12,16 +12,16 @@ yc_vid_status_t yc_vid_texture_set_initialize(
     set->keyframe_idx = animation->keyframe_idx;
 
     set->count = animation->count;
-    set->pointers = malloc(sizeof(yc_vid_texture_handle_t) * set->count);
+    set->textures = malloc(sizeof(yc_vid_texture_t) * set->count);
 
-    if (NULL == set->pointers) {
+    if (NULL == set->textures) {
         yc_vid_texture_set_invalidate(set, renderer);
         return YC_VID_STATUS_MEM;
     }
 
-    for (size_t handle_idx = 0; handle_idx < set->count; ++handle_idx) {
-        yc_res_frm_texture_t *blueprint = &animation->frames[handle_idx];
-        yc_vid_texture_handle_t *handle = &set->pointers[handle_idx];
+    for (size_t pair_idx = 0; pair_idx < set->count; ++pair_idx) {
+        yc_res_frm_texture_t *blueprint = &animation->frames[pair_idx];
+        yc_vid_texture_t *result = &set->textures[pair_idx];
 
         yc_vid_texture_data_t data = {
                 .shift = blueprint->shift,
@@ -56,7 +56,7 @@ yc_vid_status_t yc_vid_texture_set_initialize(
             }
         }
 
-        yc_vid_status_t status = renderer->texture->initialize(&data, &handle);
+        yc_vid_status_t status = renderer->texture->initialize(&data, result);
 
         free(data.pixels);
         data.pixels = NULL;
