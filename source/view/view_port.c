@@ -18,8 +18,8 @@ yc_vid_status_t yc_vid_view_port_set(yc_vid_view_t *view, yc_vid_renderer_t *ren
     // TODO: Destroy textures that became outside.
     // TODO: Don't iterate over objects and tiles outside the view.
 
-    renderer->texture->create(NULL, NULL);
-    renderer->texture->destroy(NULL);
+    renderer->texture->initialize(NULL, NULL);
+    renderer->texture->invalidate(NULL);
 
     return YC_VID_STATUS_OK;
 }

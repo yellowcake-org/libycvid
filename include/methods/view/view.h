@@ -7,7 +7,7 @@ yc_vid_status_t yc_vid_view_initialize(
         const yc_vid_renderer_t *renderer
 );
 
-void yc_vid_view_destroy(
+void yc_vid_view_invalidate(
         yc_vid_view_t *view,
         const yc_vid_renderer_t *renderer
 );

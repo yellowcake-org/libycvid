@@ -20,7 +20,7 @@ yc_vid_status_t yc_vid_view_frame_tick(
     // update: hide current, show new; set coords for new
 
     renderer->texture->set_coordinates(NULL, NULL);
-    renderer->texture->destroy(NULL);
+    renderer->texture->invalidate(NULL);
 
     return YC_VID_STATUS_OK;
 }
