@@ -24,11 +24,15 @@ yc_vid_status_t yc_vid_view_frame_tick(
             // Set new frame index.
             object->state.frame_idx += effective;
 
-            // Hide old texture, show new. Set correct position.;
+            // Update texture.
             yc_vid_texture_t *new = &set->textures[object->state.frame_idx];
             yc_vid_texture_t *old = object->state.texture;
             object->state.texture = new;
 
+            // Check if texture been changed.
+            if (true == renderer->texture->is_equal(old, new)) { continue; }
+
+            // Hide old texture, show new. Set correct position.
             if (NULL != old) {
                 status = renderer->texture->set_visibility(old, YC_VID_TEXTURE_VISIBILITY_OFF);
                 if (YC_VID_STATUS_OK != status) { return status; }
