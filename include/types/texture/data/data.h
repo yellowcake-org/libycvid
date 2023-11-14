@@ -22,7 +22,7 @@ typedef enum yc_vid_texture_visibility {
 typedef struct yc_vid_texture_data {
     yc_res_pal_color_t *pixels;
 
-    yc_res_frm_shift_t shift;
+    yc_vid_shift_t shift;
     yc_vid_dimensions_t dimensions;
 } yc_vid_texture_data_t;
 

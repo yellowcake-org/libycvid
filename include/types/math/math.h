@@ -7,6 +7,10 @@ typedef struct yc_vid_coordinates {
     uint64_t x, y;
 } yc_vid_coordinates_t;
 
+typedef struct yc_vid_shift {
+    int64_t horizontal, vertical;
+} yc_vid_shift_t;
+
 typedef struct yc_vid_dimensions {
     uint64_t horizontal, vertical;
 } yc_vid_dimensions_t;
