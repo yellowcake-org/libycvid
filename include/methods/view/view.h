@@ -4,7 +4,8 @@
 yc_vid_status_t yc_vid_view_initialize(
         yc_vid_view_t *view,
         yc_res_map_level_t *level,
-        const yc_vid_renderer_t *renderer
+        const yc_vid_renderer_t *renderer,
+        const yc_vid_database_api_t *database
 );
 
 void yc_vid_view_invalidate(

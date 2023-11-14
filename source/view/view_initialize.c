@@ -2,7 +2,10 @@
 #include <private.h>
 
 yc_vid_status_t yc_vid_view_initialize(
-        yc_vid_view_t *view, yc_res_map_level_t *level, const yc_vid_renderer_t *renderer
+        yc_vid_view_t *view,
+        yc_res_map_level_t *level,
+        const yc_vid_renderer_t *renderer,
+        const yc_vid_database_api_t *database
 ) {
     if (NULL == view) { return YC_VID_STATUS_INPUT; }
     if (NULL == level) { return YC_VID_STATUS_INPUT; }
@@ -21,7 +24,7 @@ yc_vid_status_t yc_vid_view_initialize(
     yc_vid_status_t status = YC_VID_STATUS_OK;
 
     //  Load floor tiles.
-    status = yc_vid_view_objects_initialize(&view->floor, &level->floor, renderer);
+    status = yc_vid_view_objects_initialize(&view->floor, &level->floor, renderer, database);
 
     if (YC_VID_STATUS_OK != status) {
         yc_vid_view_invalidate(view, renderer);
@@ -29,7 +32,7 @@ yc_vid_status_t yc_vid_view_initialize(
     }
 
     // Load roofs' tiles.
-    status = yc_vid_view_objects_initialize(&view->roofs, &level->roof, renderer);
+    status = yc_vid_view_objects_initialize(&view->roofs, &level->roof, renderer, database);
 
     if (YC_VID_STATUS_OK != status) {
         yc_vid_view_invalidate(view, renderer);
