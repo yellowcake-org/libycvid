@@ -10,7 +10,9 @@ typedef struct yc_vid_view {
     yc_vid_time_seconds_t time;
 
     // TODO: Ability to process 'world updates':
-    //  moving, removing and adding objects and tiles.
+    // moving, removing and adding objects and tiles.
+    // In other words, there has to be a way to make updates from 'level'
+    // to objects:
     yc_vid_view_objects_t objects;
     yc_vid_view_objects_t floor, roofs;
 } yc_vid_view_t;

@@ -1,11 +1,14 @@
 #ifndef LIBYCVID_INCLUDE_TYPES_VIEW_OBJECT_H
 #define LIBYCVID_INCLUDE_TYPES_VIEW_OBJECT_H
 
+#include "state/state.h"
+
 typedef struct yc_vid_view_object {
     size_t count;
+    size_t orientations[YC_RES_MATH_ORIENTATION_COUNT];
     yc_vid_texture_set_t *sets;
 
-    yc_res_math_orientation_t orientations[YC_RES_MATH_ORIENTATION_COUNT];
+    yc_vid_view_object_state_t state;
 } yc_vid_view_object_t;
 
 typedef struct yc_vid_view_objects {

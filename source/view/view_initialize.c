@@ -20,6 +20,9 @@ yc_vid_status_t yc_vid_view_initialize(
     view->port.dimensions.vertical = 0;
     view->port.dimensions.horizontal = 0;
 
+    view->time.value = 0;
+    view->time.scale = 60;
+
     // Load objects. Start from 'OK'.
     yc_vid_status_t status = YC_VID_STATUS_OK;
 

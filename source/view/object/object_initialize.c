@@ -16,6 +16,10 @@ yc_vid_status_t yc_vid_view_object_initialize(
 
     yc_vid_status_t status = YC_VID_STATUS_OK;
 
+    // Initialize empty state.
+    object->state.texture = NULL;
+    object->state.frame_idx = 0;
+
     // Copy orientations table.
     for (size_t orientation_idx = 0; orientation_idx < YC_RES_MATH_ORIENTATION_COUNT; ++orientation_idx) {
         object->orientations[orientation_idx] = resources->frm.sprite->orientations[orientation_idx];
