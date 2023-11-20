@@ -45,9 +45,9 @@ yc_vid_status_t yc_vid_texture_set_initialize(
             return YC_VID_STATUS_MEM;
         }
 
-        for (size_t horizontal_idx = 0; horizontal_idx < data.dimensions.horizontal; ++horizontal_idx) {
-            for (size_t vertical_idx = 0; vertical_idx < data.dimensions.vertical; ++vertical_idx) {
-                size_t linear_idx = horizontal_idx * vertical_idx;
+        for (size_t vertical_idx = 0; vertical_idx < data.dimensions.vertical; ++vertical_idx) {
+            for (size_t horizontal_idx = 0; horizontal_idx < data.dimensions.horizontal; ++horizontal_idx) {
+                size_t linear_idx = horizontal_idx + (vertical_idx * data.dimensions.horizontal);
 
                 yc_res_pal_color_t *source = &palette->colors[compressed->pixels[linear_idx]];
                 yc_res_pal_color_t *destination = &data.pixels[linear_idx];
@@ -59,7 +59,7 @@ yc_vid_status_t yc_vid_texture_set_initialize(
         }
 
         yc_vid_texture_t *result = &set->textures[pair_idx];
-        yc_vid_status_t status = renderer->texture->initialize(&data, result);
+        yc_vid_status_t status = renderer->texture->initialize(&data, result, renderer->context);
 
         // Data invalidation, embedded.
         free(data.pixels);

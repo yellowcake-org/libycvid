@@ -6,7 +6,7 @@ void yc_vid_texture_set_invalidate(yc_vid_texture_set_t *set, const yc_vid_rende
     if (NULL == set) { return; }
 
     for (size_t handle_idx = 0; handle_idx < set->count; ++handle_idx) {
-        renderer->texture->invalidate(&set->textures[handle_idx]);
+        renderer->texture->invalidate(&set->textures[handle_idx], renderer->context);
     }
 
     set->count = 0;

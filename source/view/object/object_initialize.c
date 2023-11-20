@@ -49,7 +49,6 @@ yc_vid_status_t yc_vid_view_object_initialize(
     }
 
     cleanup_and_return:
-
     return status;
 }
 
@@ -64,17 +63,24 @@ yc_vid_status_t yc_vid_view_objects_initialize(
     objects->pointers = malloc(sizeof(yc_vid_view_object_t) * count);
     if (NULL == objects->pointers) { return YC_VID_STATUS_MEM; }
 
-    for (size_t horizontal_idx = 0; horizontal_idx < YC_RES_MATH_GRID_SIZE_TILES; ++horizontal_idx) {
-        for (size_t vertical_idx = 0; vertical_idx < YC_RES_MATH_GRID_SIZE_TILES; ++vertical_idx) {
-            yc_vid_view_object_t *object = &objects->pointers[horizontal_idx * vertical_idx];
-            uint16_t sprite_idx = tiles->idxes[horizontal_idx][vertical_idx];
+    for (size_t vertical_idx = 0; vertical_idx < YC_RES_MATH_GRID_SIZE_TILES; ++vertical_idx) {
+        for (size_t horizontal_idx = 0; horizontal_idx < YC_RES_MATH_GRID_SIZE_TILES; ++horizontal_idx) {
+            uint16_t sprite_idx = tiles->idxes[vertical_idx][horizontal_idx];
+
+            size_t linear_idx = horizontal_idx + vertical_idx * YC_RES_MATH_GRID_SIZE_TILES;
+            yc_vid_view_object_t *object = &objects->pointers[linear_idx];
 
             yc_vid_database_fetch_resources_result_t resources = {
                     .pal = { .count = 0, .colors = NULL },
                     .frm = { .sprite = NULL }
             };
 
-            yc_vid_status_t status = database->fetch(YC_RES_PRO_OBJECT_TYPE_TILE, sprite_idx, &resources);
+            yc_vid_status_t status = database->fetch(
+                    YC_RES_PRO_OBJECT_TYPE_TILE,
+                    sprite_idx,
+                    &resources,
+                    database->context
+            );
 
             if (YC_VID_STATUS_OK != status) {
                 yc_vid_view_objects_invalidate(objects, renderer);

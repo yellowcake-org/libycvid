@@ -7,9 +7,11 @@ yc_vid_status_t yc_vid_view_frame_tick(
         yc_vid_renderer_t *renderer,
         yc_vid_time_seconds_t *difference
 ) {
-    for (size_t horizontal_idx = 0; horizontal_idx < YC_RES_MATH_GRID_SIZE_TILES; ++horizontal_idx) {
-        for (size_t vertical_idx = 0; vertical_idx < YC_RES_MATH_GRID_SIZE_TILES; ++vertical_idx) {
-            yc_vid_view_object_t *object = &view->floor.pointers[horizontal_idx * vertical_idx];
+    for (size_t vertical_idx = 0; vertical_idx < YC_RES_MATH_GRID_SIZE_TILES; ++vertical_idx) {
+        for (size_t horizontal_idx = 0; horizontal_idx < YC_RES_MATH_GRID_SIZE_TILES; ++horizontal_idx) {
+            size_t linear_idx = horizontal_idx + vertical_idx * YC_RES_MATH_GRID_SIZE_TILES;
+            yc_vid_view_object_t *object = &view->floor.pointers[linear_idx];
+
             yc_vid_status_t status = YC_VID_STATUS_OK;
 
             // Tiles have to have only 1 set. It doesn't change.
@@ -34,20 +36,30 @@ yc_vid_status_t yc_vid_view_frame_tick(
 
             // Hide old texture, show new. Set correct position.
             if (NULL != old) {
-                status = renderer->texture->set_visibility(old, YC_VID_TEXTURE_VISIBILITY_OFF);
+                status = renderer->texture->set_visibility(old, YC_VID_TEXTURE_VISIBILITY_OFF, renderer->context);
                 if (YC_VID_STATUS_OK != status) { return status; }
             }
 
-            // TODO: Check ranges / bounds.
-            yc_vid_coordinates_t coordinates = {
-                    .x = 48 * horizontal_idx + 32 * vertical_idx,
-                    .y = 24 * vertical_idx - 12 * horizontal_idx
-            };
+            // TODO: Cleanup the code.
+            uint64_t pos_x = 0;
+            uint64_t pos_y = 0;
 
-            status = renderer->texture->set_visibility(new, YC_VID_TEXTURE_VISIBILITY_ON);
+            pos_x = 80 * horizontal_idx;
+            pos_y = 36 * vertical_idx;
+
+            pos_x = pos_x + vertical_idx * 32;
+            pos_y = pos_y + (YC_RES_MATH_GRID_SIZE_TILES - 1 - horizontal_idx) * 12;
+
+            pos_x = pos_x - (horizontal_idx * 32);
+            pos_y = pos_y - (vertical_idx * 12);
+
+            // TODO: Check ranges / bounds.
+            yc_vid_coordinates_t coordinates = { .x = pos_x, .y = pos_y };
+
+            status = renderer->texture->set_visibility(new, YC_VID_TEXTURE_VISIBILITY_ON, renderer->context);
             if (YC_VID_STATUS_OK != status) { return status; }
 
-            status = renderer->texture->set_coordinates(new, coordinates);
+            status = renderer->texture->set_coordinates(new, coordinates, renderer->context);
             if (YC_VID_STATUS_OK != status) { return status; }
         }
     }
