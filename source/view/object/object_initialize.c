@@ -14,8 +14,6 @@ yc_vid_status_t yc_vid_view_object_initialize(
     if (NULL == resources->frm.sprite) { return YC_VID_STATUS_INPUT; }
     if (NULL == resources->pal.colors) { return YC_VID_STATUS_INPUT; }
 
-    yc_vid_status_t status = YC_VID_STATUS_OK;
-
     // Initialize empty state.
     object->state.texture = NULL;
     object->state.frame_idx = 0;
@@ -30,26 +28,23 @@ yc_vid_status_t yc_vid_view_object_initialize(
     object->sets = malloc(sizeof(yc_vid_texture_set_t) * object->count);
 
     if (NULL == object->sets) {
-        status = YC_VID_STATUS_MEM;
-
         yc_vid_view_object_invalidate(object, renderer);
-        goto cleanup_and_return;
+        return YC_VID_STATUS_MEM;
     }
 
     for (size_t pair_idx = 0; pair_idx < object->count; ++pair_idx) {
         yc_vid_texture_set_t *set = &object->sets[pair_idx];
         yc_res_frm_animation_t *animation = &resources->frm.sprite->animations[pair_idx];
 
-        status = yc_vid_texture_set_initialize(set, animation, &resources->pal, renderer);
+        yc_vid_status_t status = yc_vid_texture_set_initialize(set, animation, &resources->pal, renderer);
 
         if (YC_VID_STATUS_OK != status) {
             yc_vid_view_object_invalidate(object, renderer);
-            goto cleanup_and_return;
+            return status;
         }
     }
 
-    cleanup_and_return:
-    return status;
+    return YC_VID_STATUS_OK;
 }
 
 yc_vid_status_t yc_vid_view_objects_initialize(
@@ -89,8 +84,10 @@ yc_vid_status_t yc_vid_view_objects_initialize(
 
             status = yc_vid_view_object_initialize(object, renderer, &resources);
 
-            // Cleanup fetched data.
+            // Cleanup fetched palette.
             free(resources.pal.colors);
+
+            // Cleanup fetched sprite data.
             yc_res_frm_sprite_invalidate(resources.frm.sprite);
             free(resources.frm.sprite);
 
