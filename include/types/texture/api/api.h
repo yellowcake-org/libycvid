@@ -9,7 +9,7 @@ typedef yc_vid_status_t (yc_vid_texture_invalidate_t)(yc_vid_texture_t *, void *
 typedef bool (yc_vid_texture_is_equal)(yc_vid_texture_t *, yc_vid_texture_t *);
 
 typedef yc_vid_status_t (yc_vid_texture_set_visibility_t)(
-        yc_vid_texture_t *, yc_vid_texture_visibility_t, void *context
+        yc_vid_texture_t *, yc_vid_texture_visibility_t, yc_vid_texture_order_t, void *context
 );
 
 typedef yc_vid_status_t (yc_vid_texture_set_coordinates_t)(
