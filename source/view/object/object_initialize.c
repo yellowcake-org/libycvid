@@ -4,39 +4,23 @@
 
 yc_vid_status_t yc_vid_view_object_initialize(
         yc_vid_view_object_t *object,
-        const yc_vid_renderer_t *renderer,
-        const yc_vid_database_fetch_resources_result_t *resources
+        yc_res_pro_object_type_t type,
+        uint16_t sprite_idx,
+        const yc_vid_renderer_t *renderer
 ) {
     if (NULL == object) { return YC_VID_STATUS_INPUT; }
     if (NULL == renderer) { return YC_VID_STATUS_INPUT; }
-    if (NULL == resources) { return YC_VID_STATUS_INPUT; }
-
-    if (NULL == resources->frm.sprite) { return YC_VID_STATUS_INPUT; }
-    if (NULL == resources->pal.colors) { return YC_VID_STATUS_INPUT; }
 
     // Initialize empty state.
-    object->state.texture = NULL;
-    object->state.frame_idx = 0;
+    object->current.texture = NULL;
+    object->current.frame_idx = 0;
 
-    // Copy orientations table.
-    for (size_t orientation_idx = 0; orientation_idx < YC_RES_MATH_ORIENTATION_COUNT; ++orientation_idx) {
-        object->orientations[orientation_idx] = resources->frm.sprite->orientations[orientation_idx];
-    }
+    for (yc_res_math_orientation_t orientation = 0; orientation < YC_RES_MATH_ORIENTATION_COUNT; ++orientation) {
+        yc_vid_texture_set_t *set = &object->sets[orientation];
 
-    // Initialize count and malloc sets' list.
-    object->count = resources->frm.sprite->count;
-    object->sets = malloc(sizeof(yc_vid_texture_set_t) * object->count);
-
-    if (NULL == object->sets) {
-        yc_vid_view_object_invalidate(object, renderer);
-        return YC_VID_STATUS_MEM;
-    }
-
-    for (size_t pair_idx = 0; pair_idx < object->count; ++pair_idx) {
-        yc_vid_texture_set_t *set = &object->sets[pair_idx];
-        yc_res_frm_animation_t *animation = &resources->frm.sprite->animations[pair_idx];
-
-        yc_vid_status_t status = yc_vid_texture_set_initialize(set, animation, &resources->pal, renderer);
+        yc_vid_status_t status = renderer->texture->initialize(
+                type, sprite_idx, orientation, set, renderer->context
+        );
 
         if (YC_VID_STATUS_OK != status) {
             yc_vid_view_object_invalidate(object, renderer);
@@ -50,8 +34,7 @@ yc_vid_status_t yc_vid_view_object_initialize(
 yc_vid_status_t yc_vid_view_objects_initialize(
         yc_vid_view_objects_t *objects,
         yc_res_map_level_tiles_t *tiles,
-        const yc_vid_renderer_t *renderer,
-        const yc_vid_database_api_t *database
+        const yc_vid_renderer_t *renderer
 ) {
     size_t count = (size_t) (YC_RES_MATH_GRID_SIZE_TILES) * (size_t) YC_RES_MATH_GRID_SIZE_TILES;
 
@@ -65,31 +48,12 @@ yc_vid_status_t yc_vid_view_objects_initialize(
             size_t linear_idx = horizontal_idx + vertical_idx * YC_RES_MATH_GRID_SIZE_TILES;
             yc_vid_view_object_t *object = &objects->pointers[linear_idx];
 
-            yc_vid_database_fetch_resources_result_t resources = {
-                    .pal = { .count = 0, .colors = NULL },
-                    .frm = { .sprite = NULL }
-            };
-
-            yc_vid_status_t status = database->fetch(
+            yc_vid_status_t status = yc_vid_view_object_initialize(
+                    object,
                     YC_RES_PRO_OBJECT_TYPE_TILE,
                     sprite_idx,
-                    &resources,
-                    database->context
+                    renderer
             );
-
-            if (YC_VID_STATUS_OK != status) {
-                yc_vid_view_objects_invalidate(objects, renderer);
-                return status;
-            }
-
-            status = yc_vid_view_object_initialize(object, renderer, &resources);
-
-            // Cleanup fetched palette.
-            free(resources.pal.colors);
-
-            // Cleanup fetched sprite data.
-            yc_res_frm_sprite_invalidate(resources.frm.sprite);
-            free(resources.frm.sprite);
 
             if (YC_VID_STATUS_OK != status) {
                 yc_vid_view_objects_invalidate(objects, renderer);

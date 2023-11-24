@@ -1,8 +1,13 @@
 #ifndef LIBYCVID_INCLUDE_TYPES_TEXTURE_API_H
 #define LIBYCVID_INCLUDE_TYPES_TEXTURE_API_H
 
-// TODO: Improve this to support separate palette load + pixel data initialization.
-typedef yc_vid_status_t (yc_vid_texture_initialize_t)(yc_vid_texture_data_t *, yc_vid_texture_t *, void *context);
+typedef yc_vid_status_t (yc_vid_texture_initialize_t)(
+        yc_res_pro_object_type_t,
+        uint16_t sprite_idx,
+        yc_res_math_orientation_t,
+        yc_vid_texture_set_t *,
+        void *context
+);
 
 typedef yc_vid_status_t (yc_vid_texture_invalidate_t)(yc_vid_texture_t *, void *context);
 
