@@ -33,7 +33,7 @@ yc_vid_status_t yc_vid_view_frame_tick_tile(
         yc_vid_status_t status = renderer->texture->set_visibility(
                 old,
                 YC_VID_TEXTURE_VISIBILITY_OFF,
-                YC_VID_TEXTURE_ORDER_FLOOR,
+                is_roof ? YC_VID_TEXTURE_ORDER_ROOF : YC_VID_TEXTURE_ORDER_FLOOR,
                 renderer->context
         );
 
@@ -59,7 +59,7 @@ yc_vid_status_t yc_vid_view_frame_tick_tile(
     yc_vid_status_t status = renderer->texture->set_visibility(
             new,
             YC_VID_TEXTURE_VISIBILITY_ON,
-            YC_VID_TEXTURE_ORDER_FLOOR,
+            is_roof ? YC_VID_TEXTURE_ORDER_ROOF : YC_VID_TEXTURE_ORDER_FLOOR,
             renderer->context
     );
 
