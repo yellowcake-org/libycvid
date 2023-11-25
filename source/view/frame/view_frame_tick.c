@@ -40,6 +40,15 @@ yc_vid_status_t yc_vid_view_frame_tick_tile(
         if (YC_VID_STATUS_OK != status) { return status; }
     }
 
+    yc_vid_status_t status = renderer->texture->set_visibility(
+            new,
+            YC_VID_TEXTURE_VISIBILITY_ON,
+            is_roof ? YC_VID_TEXTURE_ORDER_ROOF : YC_VID_TEXTURE_ORDER_FLOOR,
+            renderer->context
+    );
+
+    if (YC_VID_STATUS_OK != status) { return status; }
+
     // TODO: Cleanup the code.
     uint64_t pos_x = 0;
     uint64_t pos_y = 0;
@@ -55,15 +64,6 @@ yc_vid_status_t yc_vid_view_frame_tick_tile(
 
     // TODO: Check ranges / bounds.
     yc_vid_coordinates_t coordinates = { .x = pos_x, .y = pos_y };
-
-    yc_vid_status_t status = renderer->texture->set_visibility(
-            new,
-            YC_VID_TEXTURE_VISIBILITY_ON,
-            is_roof ? YC_VID_TEXTURE_ORDER_ROOF : YC_VID_TEXTURE_ORDER_FLOOR,
-            renderer->context
-    );
-
-    if (YC_VID_STATUS_OK != status) { return status; }
 
     status = renderer->texture->set_coordinates(new, coordinates, renderer->context);
     if (YC_VID_STATUS_OK != status) { return status; }

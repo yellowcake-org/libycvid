@@ -7,6 +7,7 @@ yc_vid_status_t yc_vid_view_frame_tick(
         const yc_vid_renderer_t *renderer,
         const yc_vid_time_seconds_t *difference
 ) {
+    // TODO: Better check objects' list not to be out of grid's bounds.
     for (size_t vertical_idx = 0; vertical_idx < YC_RES_MATH_GRID_SIZE_TILES; ++vertical_idx) {
         for (size_t horizontal_idx = 0; horizontal_idx < YC_RES_MATH_GRID_SIZE_TILES; ++horizontal_idx) {
             size_t linear_idx = horizontal_idx + vertical_idx * YC_RES_MATH_GRID_SIZE_TILES;
