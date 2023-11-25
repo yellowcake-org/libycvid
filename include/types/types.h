@@ -4,7 +4,6 @@
 #include "math/math.h"
 #include "time/time.h"
 #include "texture/texture.h"
-#include "database/database.h"
 
 #include "view/view.h"
 #include "renderer/renderer.h"

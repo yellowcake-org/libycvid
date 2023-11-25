@@ -6,16 +6,12 @@ void yc_vid_view_object_invalidate(yc_vid_view_object_t *object, const yc_vid_re
     if (NULL == object) { return; }
     if (NULL == renderer) { return; }
 
-    object->state.texture = NULL;
-    object->state.frame_idx = 0;
+    object->current.texture = NULL;
+    object->current.frame_idx = 0;
 
-    for (size_t set_idx = 0; set_idx < object->count; ++set_idx) {
-        yc_vid_texture_set_invalidate(&object->sets[set_idx], renderer);
+    for (yc_res_math_orientation_t orientation = 0; orientation < YC_RES_MATH_ORIENTATION_COUNT; ++orientation) {
+        yc_vid_texture_set_invalidate(&object->sets[orientation], renderer);
     }
-
-    object->count = 0;
-    free(object->sets);
-    object->sets = NULL;
 }
 
 void yc_vid_view_objects_invalidate(yc_vid_view_objects_t *objects, const  yc_vid_renderer_t *renderer) {
