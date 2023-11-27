@@ -5,6 +5,8 @@
 
 typedef struct yc_vid_view_object {
     yc_vid_texture_set_t sets[YC_RES_MATH_ORIENTATION_COUNT];
+    yc_vid_texture_order_t order;
+
     yc_vid_view_object_state_t current;
 } yc_vid_view_object_t;
 

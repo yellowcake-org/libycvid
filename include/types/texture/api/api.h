@@ -2,8 +2,7 @@
 #define LIBYCVID_INCLUDE_TYPES_TEXTURE_API_H
 
 typedef yc_vid_status_t (yc_vid_texture_initialize_t)(
-        yc_res_pro_object_type_t,
-        uint16_t sprite_idx,
+        uint32_t fid,
         yc_res_math_orientation_t,
         yc_vid_texture_set_t *,
         void *context
