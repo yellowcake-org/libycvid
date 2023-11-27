@@ -47,18 +47,22 @@ yc_vid_status_t yc_vid_view_frame_tick_coordinates_tile(
         bool is_roof,
         const yc_vid_renderer_t *renderer
 ) {
-    size_t vertical_idx = tile->current.vertical_idx;
-    size_t horizontal_idx = tile->current.horizontal_idx;
+    yc_vid_indexes_t indexes = { .x = tile->current.horizontal_idx, .y = tile->current.vertical_idx };
+    yc_vid_status_t status = renderer->texture->set_indexes(
+            tile->current.texture, indexes, YC_RES_MATH_GRID_SIZE_TILES, renderer->context
+    );
+
+    if (YC_VID_STATUS_OK != status) { return status; }
 
     // TODO: Cleanup the code.
-    uint64_t pos_x = 80 * horizontal_idx;
-    uint64_t pos_y = 36 * vertical_idx;
+    int32_t pos_x = 80 * indexes.x;
+    int32_t pos_y = 36 * indexes.y;
 
-    pos_x = pos_x + vertical_idx * 32;
-    pos_y = pos_y + (YC_RES_MATH_GRID_SIZE_TILES - 1 - horizontal_idx) * 12;
+    pos_x = pos_x + indexes.y * 32;
+    pos_y = pos_y + (YC_RES_MATH_GRID_SIZE_TILES - 1 - indexes.x) * 12;
 
-    pos_x = pos_x - (horizontal_idx * 32);
-    pos_y = pos_y - (vertical_idx * 12) - (is_roof ? 96 : 0);
+    pos_x = pos_x - (indexes.x * 32);
+    pos_y = pos_y - (indexes.y * 12) - (is_roof ? 96 : 0);
 
     // TODO: Check ranges / bounds.
     yc_vid_coordinates_t coordinates = { .x = pos_x, .y = pos_y };
@@ -69,28 +73,32 @@ yc_vid_status_t yc_vid_view_frame_tick_coordinates_object(
         yc_vid_view_object_t *object,
         const yc_vid_renderer_t *renderer
 ) {
-    int32_t vertical_idx = object->current.vertical_idx;
-    int32_t horizontal_idx = object->current.horizontal_idx;
+    yc_vid_indexes_t indexes = { .x = object->current.horizontal_idx, .y = object->current.vertical_idx };
+    yc_vid_status_t status = renderer->texture->set_indexes(
+            object->current.texture, indexes, YC_RES_MATH_GRID_SIZE_HEXES, renderer->context
+    );
+
+    if (YC_VID_STATUS_OK != status) { return status; }
 
     // TODO: Cleanup the code.
     int32_t pos_x = 0;
     int32_t pos_y = 0;
 
-    pos_x = 80 * horizontal_idx;
-    pos_y = 36 * vertical_idx;
+    pos_x = 80 * indexes.x;
+    pos_y = 36 * indexes.y;
 
-    pos_x = pos_x + vertical_idx * 32;
-    pos_y = pos_y + (YC_RES_MATH_GRID_SIZE_TILES - 1 - horizontal_idx) * 12;
+    pos_x = pos_x + indexes.y * 32;
+    pos_y = pos_y + (YC_RES_MATH_GRID_SIZE_TILES - 1 - indexes.x) * 12;
 
-    pos_x = pos_x - (horizontal_idx * 32);
-    pos_y = pos_y - (vertical_idx * 12);
+    pos_x = pos_x - (indexes.x * 32);
+    pos_y = pos_y - (indexes.y * 12);
 
     int32_t scale = YC_RES_MATH_GRID_SIZE_HEXES / YC_RES_MATH_GRID_SIZE_TILES;
 
     pos_x = pos_x / scale;
     pos_y = pos_y / scale;
 
-    bool is_row_even = horizontal_idx % 2 == 0;
+    bool is_row_even = indexes.x % 2 == 0;
 
     pos_x = pos_x - 8 + (is_row_even ? 0 : 8);
     pos_y = pos_y - 8 + (is_row_even ? 0 : 6);
