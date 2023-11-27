@@ -12,29 +12,39 @@ yc_vid_status_t yc_vid_view_frame_tick(
         for (size_t horizontal_idx = 0; horizontal_idx < YC_RES_MATH_GRID_SIZE_TILES; ++horizontal_idx) {
             size_t linear_idx = horizontal_idx + vertical_idx * YC_RES_MATH_GRID_SIZE_TILES;
 
-            yc_vid_view_frame_tick_tile(
-                    &view->floor.pointers[linear_idx],
-                    renderer,
-                    difference,
-                    horizontal_idx,
-                    vertical_idx,
-                    false
+            yc_vid_status_t status = YC_VID_STATUS_OK;
+            status = yc_vid_view_frame_tick_object(&view->floor.pointers[linear_idx], renderer, difference);
+
+            if (YC_VID_STATUS_OK != status) { return status; }
+
+            status = yc_vid_view_frame_tick_coordinates_tile(
+                    &view->floor.pointers[linear_idx], false, renderer
             );
 
-            yc_vid_view_frame_tick_tile(
-                    &view->roofs.pointers[linear_idx],
-                    renderer,
-                    difference,
-                    horizontal_idx,
-                    vertical_idx,
-                    true
+            if (YC_VID_STATUS_OK != status) { return status; }
+
+            status = yc_vid_view_frame_tick_object(&view->roofs.pointers[linear_idx], renderer, difference);
+
+            if (YC_VID_STATUS_OK != status) { return status; }
+
+            status = yc_vid_view_frame_tick_coordinates_tile(
+                    &view->roofs.pointers[linear_idx], true, renderer
             );
+
+            if (YC_VID_STATUS_OK != status) { return status; }
         }
     }
 
-    // iterating objects...
-    // selection: object -> (location + orientation) -> animation -> frame -> texture_handle
-    // update: hide current, show new; set coords for new
+    for (size_t index = 0; index < view->objects.count; ++index) {
+        yc_vid_view_object_t *current = &view->objects.pointers[index];
+        yc_vid_status_t status = YC_VID_STATUS_OK;
+
+        status = yc_vid_view_frame_tick_object(current, renderer, difference);
+        if (YC_VID_STATUS_OK != status) { return status; }
+
+        status = yc_vid_view_frame_tick_coordinates_object(current, renderer);
+        if (YC_VID_STATUS_OK != status) { return status; }
+    }
 
     // TODO: Advance time from the difference with another scale, too.
     if (view->time.scale != difference->scale) { return YC_VID_STATUS_CORRUPTED; }

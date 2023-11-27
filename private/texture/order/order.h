@@ -1,0 +1,6 @@
+#ifndef LIBYCVID_PRIVATE_TEXTURE_ORDER_H
+#define LIBYCVID_PRIVATE_TEXTURE_ORDER_H
+
+yc_vid_texture_order_t yc_vid_texture_order_from_object_type(yc_res_pro_object_type_t type);
+
+#endif //LIBYCVID_PRIVATE_TEXTURE_ORDER_H

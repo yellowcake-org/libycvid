@@ -26,7 +26,9 @@ yc_vid_status_t yc_vid_view_initialize(
     yc_vid_status_t status = YC_VID_STATUS_OK;
 
     //  Load floor tiles.
-    status = yc_vid_view_objects_initialize(&view->floor, &level->floor, renderer);
+    status = yc_vid_view_objects_initialize_from_tiles(
+            &view->floor, &level->floor, false, renderer
+    );
 
     if (YC_VID_STATUS_OK != status) {
         yc_vid_view_invalidate(view, renderer);
@@ -34,14 +36,24 @@ yc_vid_status_t yc_vid_view_initialize(
     }
 
     // Load roofs' tiles.
-    status = yc_vid_view_objects_initialize(&view->roofs, &level->roof, renderer);
+    status = yc_vid_view_objects_initialize_from_tiles(
+            &view->roofs, &level->roof, true, renderer
+    );
 
     if (YC_VID_STATUS_OK != status) {
         yc_vid_view_invalidate(view, renderer);
         return status;
     }
 
-    // TODO: Load level's objects.
+    // Load level's objects.
+    status = yc_vid_view_objects_initialize_from_objects(
+            &view->objects, &level->objects, renderer
+    );
+
+    if (YC_VID_STATUS_OK != status) {
+        yc_vid_view_invalidate(view, renderer);
+        return status;
+    }
 
     return status;
 }
