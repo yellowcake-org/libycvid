@@ -10,6 +10,7 @@ typedef enum yc_vid_texture_order {
     YC_VID_TEXTURE_ORDER_ITEM,
     YC_VID_TEXTURE_ORDER_CRITTER,
     YC_VID_TEXTURE_ORDER_ROOF,
+    YC_VID_TEXTURE_ORDER_COUNT
 } yc_vid_texture_order_t;
 
 #endif //LIBYCVID_INCLUDE_TYPES_TEXTURE_ORDER_H
