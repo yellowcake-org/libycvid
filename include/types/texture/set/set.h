@@ -3,6 +3,7 @@
 
 typedef struct yc_vid_texture_set {
     uint16_t fps, keyframe_idx;
+    yc_vid_time_seconds_t accumulated;
 
     size_t count;
     yc_vid_texture_t *textures;

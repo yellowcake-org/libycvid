@@ -15,7 +15,7 @@ yc_vid_status_t yc_vid_view_object_initialize_from_tile(
 
     // Initialize empty state.
     object->current.texture = NULL;
-    object->current.frame_idx = 0;
+    object->current.frame_idx = object->sets[YC_RES_MATH_ORIENTATION_NE].keyframe_idx;
 
     // Coordinates and orientation.
     object->current.correction_x = 0;

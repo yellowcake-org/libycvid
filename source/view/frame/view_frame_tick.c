@@ -9,20 +9,33 @@ yc_vid_status_t yc_vid_view_frame_tick_object(
     // Choose current set using the orientation.
     yc_vid_texture_set_t *set = &object->sets[object->current.orientation];
 
+    // Accumulate time difference.
+    // TODO: Support different scales.
+    set->accumulated.scale = difference->scale;
+    set->accumulated.value += difference->value;
+
     // Calculate frame advance.
-    uint64_t advance = (set->fps * difference->value) / difference->scale;
-    uint64_t rounds = advance / set->count;
-    uint64_t effective = advance - (set->count * rounds);
+    uint64_t advance = (set->fps * set->accumulated.value) / set->accumulated.scale;
 
-    // Set new frame index.
-    object->current.frame_idx += effective;
+    // If no enough time passed to switch even one frame, we're done.
+    if (0 == advance && NULL != object->current.texture) { return YC_VID_STATUS_OK; }
 
-    // Update texture.
-    yc_vid_texture_t *new = &set->textures[object->current.frame_idx];
+    // Or, subtract round time difference which will be handled now.
+    // TODO: Support different scales.
+    uint64_t handled = (set->accumulated.scale * advance) / set->fps;
+    set->accumulated.value -= (set->accumulated.value > handled ? handled : set->accumulated.value);
+
+    // Set new frame index, rounding to nearest in range of sets' frame count.
+    object->current.frame_idx = (object->current.frame_idx + advance) % set->count;
+
+    // Switch texture.
     yc_vid_texture_t *old = object->current.texture;
+    yc_vid_texture_t *new = &set->textures[object->current.frame_idx];
+
     object->current.texture = new;
 
-    // Check if texture been changed.
+    // Check if texture changed.
+    // TODO: Maybe prune this check and store another reference to old one?
     if (true == renderer->texture->is_equal(old, new)) { return YC_VID_STATUS_OK; }
 
     // Hide old texture, show new. Set correct position.
@@ -38,8 +51,7 @@ yc_vid_status_t yc_vid_view_frame_tick_object(
             new, YC_VID_TEXTURE_VISIBILITY_ON, object->order, renderer->context
     );
 
-    if (YC_VID_STATUS_OK != status) { return status; }
-    return YC_VID_STATUS_OK;
+    return status;
 }
 
 yc_vid_status_t yc_vid_view_frame_tick_coordinates_tile(
@@ -47,7 +59,7 @@ yc_vid_status_t yc_vid_view_frame_tick_coordinates_tile(
         bool is_roof,
         const yc_vid_renderer_t *renderer
 ) {
-    yc_vid_indexes_t indexes = { .x = tile->current.horizontal_idx, .y = tile->current.vertical_idx };
+    yc_vid_indexes_t indexes = {.x = tile->current.horizontal_idx, .y = tile->current.vertical_idx};
     yc_vid_status_t status = renderer->texture->set_indexes(
             tile->current.texture, indexes, YC_RES_MATH_GRID_SIZE_TILES, renderer->context
     );
@@ -65,7 +77,7 @@ yc_vid_status_t yc_vid_view_frame_tick_coordinates_tile(
     pos_y = pos_y - (indexes.y * 12) - (is_roof ? 96 : 0);
 
     // TODO: Check ranges / bounds.
-    yc_vid_coordinates_t coordinates = { .x = pos_x, .y = pos_y };
+    yc_vid_coordinates_t coordinates = {.x = pos_x, .y = pos_y};
     return renderer->texture->set_coordinates(tile->current.texture, coordinates, renderer->context);
 }
 
@@ -73,7 +85,7 @@ yc_vid_status_t yc_vid_view_frame_tick_coordinates_object(
         yc_vid_view_object_t *object,
         const yc_vid_renderer_t *renderer
 ) {
-    yc_vid_indexes_t indexes = { .x = object->current.horizontal_idx, .y = object->current.vertical_idx };
+    yc_vid_indexes_t indexes = {.x = object->current.horizontal_idx, .y = object->current.vertical_idx};
     yc_vid_status_t status = renderer->texture->set_indexes(
             object->current.texture, indexes, YC_RES_MATH_GRID_SIZE_HEXES, renderer->context
     );
@@ -107,6 +119,6 @@ yc_vid_status_t yc_vid_view_frame_tick_coordinates_object(
     pos_y = pos_y + (int32_t) object->current.correction_y;
 
     // TODO: Check ranges / bounds.
-    yc_vid_coordinates_t coordinates = { .x = pos_x, .y = pos_y + 36 * 16 };
+    yc_vid_coordinates_t coordinates = {.x = pos_x, .y = pos_y + 36 * 16};
     return renderer->texture->set_coordinates(object->current.texture, coordinates, renderer->context);
 }
