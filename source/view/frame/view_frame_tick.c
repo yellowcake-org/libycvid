@@ -38,12 +38,15 @@ yc_vid_status_t yc_vid_view_frame_tick_object(
     // TODO: Maybe prune this check and store another reference to old one?
     if (true == renderer->texture->is_equal(old, new)) { return YC_VID_STATUS_OK; }
 
-    // Hide old texture, show new. Set correct position.
+    // Hide old texture, show new. Set correct order and position.
     if (NULL != old) {
         yc_vid_status_t status = renderer->texture->set_visibility(
                 old, YC_VID_TEXTURE_VISIBILITY_OFF, object->order, renderer->context
         );
 
+        if (YC_VID_STATUS_OK != status) { return status; }
+
+        status = yc_vid_view_frame_tick_coordinates_object(object, renderer);
         if (YC_VID_STATUS_OK != status) { return status; }
     }
 

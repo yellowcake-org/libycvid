@@ -13,10 +13,6 @@ yc_vid_status_t yc_vid_view_object_initialize_from_tile(
     if (NULL == object) { return YC_VID_STATUS_INPUT; }
     if (NULL == renderer) { return YC_VID_STATUS_INPUT; }
 
-    // Initialize empty state.
-    object->current.texture = NULL;
-    object->current.frame_idx = object->sets[YC_RES_MATH_ORIENTATION_NE].keyframe_idx;
-
     // Coordinates and orientation.
     object->current.correction_x = 0;
     object->current.correction_y = 0;
@@ -30,16 +26,38 @@ yc_vid_status_t yc_vid_view_object_initialize_from_tile(
     object->order = is_roof ? YC_VID_TEXTURE_ORDER_ROOF : YC_VID_TEXTURE_ORDER_FLOOR;
 
     for (yc_res_math_orientation_t orientation = 0; orientation < YC_RES_MATH_ORIENTATION_COUNT; ++orientation) {
-        yc_vid_texture_set_t *set = &object->sets[orientation];
+        yc_vid_texture_set_t *current = &object->sets[orientation];
 
         yc_vid_status_t status = renderer->texture->initialize(
-                yc_res_pro_fid_from(sprite_idx, YC_RES_PRO_OBJECT_TYPE_TILE), orientation, set, renderer->context
+                yc_res_pro_fid_from(sprite_idx, YC_RES_PRO_OBJECT_TYPE_TILE), orientation, current, renderer->context
         );
 
         if (YC_VID_STATUS_OK != status) {
             yc_vid_view_object_invalidate(object, renderer);
             return status;
         }
+    }
+
+    // Initialize graphics state.
+    yc_vid_texture_set_t *set = &object->sets[object->current.orientation];
+
+    object->current.frame_idx = set->keyframe_idx;
+    object->current.texture = &set->textures[object->current.frame_idx];
+
+    yc_vid_status_t status = renderer->texture->set_visibility(
+            object->current.texture, YC_VID_TEXTURE_VISIBILITY_ON, object->order, renderer->context
+    );
+
+    if (YC_VID_STATUS_OK != status) {
+        yc_vid_view_object_invalidate(object, renderer);
+        return status;
+    }
+
+    status = yc_vid_view_frame_tick_coordinates_tile(object, is_roof, renderer);
+
+    if (YC_VID_STATUS_OK != status) {
+        yc_vid_view_object_invalidate(object, renderer);
+        return status;
     }
 
     return YC_VID_STATUS_OK;
@@ -93,10 +111,6 @@ yc_vid_status_t yc_vid_view_object_initialize_from_object(
     if (NULL == video_object) { return YC_VID_STATUS_INPUT; }
     if (NULL == level_object) { return YC_VID_STATUS_INPUT; }
 
-    // Initialize empty state.
-    video_object->current.texture = NULL;
-    video_object->current.frame_idx = 0;
-
     // Coordinates and orientation.
     video_object->current.correction_x = level_object->correction_x;
     video_object->current.correction_y = level_object->correction_y;
@@ -115,12 +129,12 @@ yc_vid_status_t yc_vid_view_object_initialize_from_object(
             yc_vid_texture_order_from_object_type(yc_res_pro_object_type_from_pid(level_object->proto_id));
 
     for (yc_res_math_orientation_t orientation = 0; orientation < YC_RES_MATH_ORIENTATION_COUNT; ++orientation) {
-        yc_vid_texture_set_t *set = &video_object->sets[orientation];
+        yc_vid_texture_set_t *current = &video_object->sets[orientation];
 
         yc_vid_status_t status = renderer->texture->initialize(
                 level_object->sprite_id,
                 orientation,
-                set,
+                current,
                 renderer->context
         );
 
@@ -128,6 +142,28 @@ yc_vid_status_t yc_vid_view_object_initialize_from_object(
             yc_vid_view_object_invalidate(video_object, renderer);
             return status;
         }
+    }
+
+    // Initialize graphics state.
+    yc_vid_texture_set_t *set = &video_object->sets[video_object->current.orientation];
+
+    video_object->current.frame_idx = set->keyframe_idx;
+    video_object->current.texture = &set->textures[video_object->current.frame_idx];
+
+    yc_vid_status_t status = renderer->texture->set_visibility(
+            video_object->current.texture, YC_VID_TEXTURE_VISIBILITY_ON, video_object->order, renderer->context
+    );
+
+    if (YC_VID_STATUS_OK != status) {
+        yc_vid_view_object_invalidate(video_object, renderer);
+        return status;
+    }
+
+    status = yc_vid_view_frame_tick_coordinates_object(video_object, renderer);
+
+    if (YC_VID_STATUS_OK != status) {
+        yc_vid_view_object_invalidate(video_object, renderer);
+        return status;
     }
 
     return YC_VID_STATUS_OK;
