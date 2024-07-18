@@ -23,7 +23,7 @@ yc_vid_status_t yc_vid_view_frame_tick_object(
     // Or, subtract round time difference which will be handled now.
     // TODO: Support different scales.
     uint64_t handled = (set->accumulated.scale * advance) / set->fps;
-    set->accumulated.value -= (set->accumulated.value > handled ? handled : set->accumulated.value);
+    set->accumulated.value -= handled;
 
     // Set new frame index, rounding to nearest in range of sets' frame count.
     object->current.frame_idx = (object->current.frame_idx + advance) % set->count;
