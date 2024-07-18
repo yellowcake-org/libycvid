@@ -45,14 +45,16 @@ yc_vid_status_t yc_vid_view_frame_tick_object(
         );
 
         if (YC_VID_STATUS_OK != status) { return status; }
-
-        status = yc_vid_view_frame_tick_coordinates_object(object, renderer);
-        if (YC_VID_STATUS_OK != status) { return status; }
     }
 
     yc_vid_status_t status = renderer->texture->set_visibility(
             new, YC_VID_TEXTURE_VISIBILITY_ON, object->order, renderer->context
     );
+
+    if (YC_VID_STATUS_OK != status) { return status; }
+
+    status = yc_vid_view_frame_tick_coordinates_object(object, renderer);
+    if (YC_VID_STATUS_OK != status) { return status; }
 
     return status;
 }

@@ -148,23 +148,7 @@ yc_vid_status_t yc_vid_view_object_initialize_from_object(
     yc_vid_texture_set_t *set = &video_object->sets[video_object->current.orientation];
 
     video_object->current.frame_idx = set->keyframe_idx;
-    video_object->current.texture = &set->textures[video_object->current.frame_idx];
-
-    yc_vid_status_t status = renderer->texture->set_visibility(
-            video_object->current.texture, YC_VID_TEXTURE_VISIBILITY_ON, video_object->order, renderer->context
-    );
-
-    if (YC_VID_STATUS_OK != status) {
-        yc_vid_view_object_invalidate(video_object, renderer);
-        return status;
-    }
-
-    status = yc_vid_view_frame_tick_coordinates_object(video_object, renderer);
-
-    if (YC_VID_STATUS_OK != status) {
-        yc_vid_view_object_invalidate(video_object, renderer);
-        return status;
-    }
+    video_object->current.texture = NULL;
 
     return YC_VID_STATUS_OK;
 }
