@@ -150,6 +150,14 @@ yc_vid_status_t yc_vid_view_object_initialize_from_object(
     video_object->current.frame_idx = set->keyframe_idx;
     video_object->current.texture = NULL;
 
+    // Calculate and set positions for all textures in all orientation sets.
+    yc_vid_status_t status = yc_vid_view_frame_tick_coordinates_object(video_object, renderer);
+
+    if (YC_VID_STATUS_OK != status) {
+        yc_vid_view_object_invalidate(video_object, renderer);
+        return status;
+    }
+
     return YC_VID_STATUS_OK;
 }
 

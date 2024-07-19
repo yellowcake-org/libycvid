@@ -53,9 +53,6 @@ yc_vid_status_t yc_vid_view_frame_tick_object(
 
     if (YC_VID_STATUS_OK != status) { return status; }
 
-    status = yc_vid_view_frame_tick_coordinates_object(object, renderer);
-    if (YC_VID_STATUS_OK != status) { return status; }
-
     return status;
 }
 
@@ -90,9 +87,28 @@ yc_vid_status_t yc_vid_view_frame_tick_coordinates_object(
         yc_vid_view_object_t *object,
         const yc_vid_renderer_t *renderer
 ) {
+    for (size_t orientation = 0; orientation < YC_RES_MATH_ORIENTATION_COUNT; ++orientation) {
+        yc_vid_texture_set_t *set = &object->sets[orientation];
+
+        for (size_t texture_idx = 0; texture_idx < set->count; ++texture_idx) {
+            yc_vid_texture_t *texture = &set->textures[texture_idx];
+
+            yc_vid_view_frame_tick_texture_coordinates_object(texture, object, renderer);
+
+        }
+    }
+
+    return YC_VID_STATUS_OK;
+}
+
+yc_vid_status_t yc_vid_view_frame_tick_texture_coordinates_object(
+        yc_vid_texture_t *texture,
+        const yc_vid_view_object_t *object,
+        const yc_vid_renderer_t *renderer
+) {
     yc_vid_indexes_t indexes = {.x = object->current.horizontal_idx, .y = object->current.vertical_idx};
     yc_vid_status_t status = renderer->texture->set_indexes(
-            object->current.texture, indexes, YC_RES_MATH_GRID_SIZE_HEXES, renderer->context
+            texture, indexes, YC_RES_MATH_GRID_SIZE_HEXES, renderer->context
     );
 
     if (YC_VID_STATUS_OK != status) { return status; }
@@ -125,5 +141,9 @@ yc_vid_status_t yc_vid_view_frame_tick_coordinates_object(
 
     // TODO: Check ranges / bounds.
     yc_vid_coordinates_t coordinates = {.x = pos_x, .y = pos_y + 36 * 16};
-    return renderer->texture->set_coordinates(object->current.texture, coordinates, renderer->context);
+
+    status = renderer->texture->set_coordinates(texture, coordinates, renderer->context);
+    if (YC_VID_STATUS_OK != status) { return status; }
+
+    return status;
 }

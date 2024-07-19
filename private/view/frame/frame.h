@@ -18,4 +18,10 @@ yc_vid_status_t yc_vid_view_frame_tick_coordinates_object(
         const yc_vid_renderer_t *renderer
 );
 
+yc_vid_status_t yc_vid_view_frame_tick_texture_coordinates_object(
+        yc_vid_texture_t *texture,
+        const yc_vid_view_object_t *object,
+        const yc_vid_renderer_t *renderer
+);
+
 #endif //LIBYCVID_PRIVATE_VIEW_FRAME_H
