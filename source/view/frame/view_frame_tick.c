@@ -32,11 +32,11 @@ yc_vid_status_t yc_vid_view_frame_tick_object(
     yc_vid_texture_t *old = object->current.texture;
     yc_vid_texture_t *new = &set->textures[object->current.frame_idx];
 
-    object->current.texture = new;
-
     // Check if texture changed.
     // TODO: Maybe prune this check and store another reference to old one?
     if (true == renderer->texture->is_equal(old, new)) { return YC_VID_STATUS_OK; }
+
+    object->current.texture = new;
 
     // Hide old texture, show new. Set correct order and position.
     if (NULL != old) {
@@ -46,6 +46,9 @@ yc_vid_status_t yc_vid_view_frame_tick_object(
 
         if (YC_VID_STATUS_OK != status) { return status; }
     }
+
+    // New texture is not allowed to be empty.
+    if (NULL == new) { return YC_VID_STATUS_CORRUPTED; }
 
     yc_vid_status_t status = renderer->texture->set_visibility(
             new, YC_VID_TEXTURE_VISIBILITY_ON, object->order, renderer->context
